@@ -16,13 +16,32 @@ uint16_t I;
 uint16_t stack[64];
 uint8_t stckPtr;
 
-//RAM 4KB
+//RAM 4KB, cada instruccion es de 2 bytes,
+//se carga 1 byte por indice, se accede con el indice a la posicion de memoria
 uint8_t RAM[4096];
 
 int main()
 {
-	printf("%lu", sizeof(I));
-	printf("\nMerge esta modificacion de new con master\n");
-	//comentario hecho desde cel
+	FILE *f;
+	f = fopen("ROM", "rb");
+
+	int i = 0;
+
+	while (1)
+	{
+		RAM[i] = fgetc(f);
+		if (feof(f))
+		{
+			break;
+		}
+		i++;
+	}
+
+	for (int c = 0; c < i; c++)
+	{
+		printf("%02X ", RAM[c]);
+	}
+	fclose(f);
+
 	return 0;
 }
