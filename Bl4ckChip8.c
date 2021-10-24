@@ -22,6 +22,6 @@ uint8_t RAM[4096];
 int main()
 {
 	printf("%lu", sizeof(I));
-	printf("\nEsta modificacion solo deberia existir en branch new\n");
+	printf("\nMerge esta modificacion de new con master\n");
 	return 0;
 }
