@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("\nSize of the ROM loaded: %d bytes\n", ROMsize);
+	printf("\nSuccess!\n");
 
 	return 0;
 }
