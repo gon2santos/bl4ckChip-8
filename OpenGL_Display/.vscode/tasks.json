@@ -8,11 +8,19 @@
 			"args": [
 				"-fdiagnostics-color=always",
 				"-Wall",
-				"`pkg-config --cflags glfw3`",
 				"-o",
 				"${fileDirname}/bin/${fileBasenameNoExtension}",
 				"${file}",
-				"`pkg-config --static --libs glfw3`"
+				"glad.c",
+				"-lglfw3",
+				"-lGL",
+				"-lX11", 
+				"-lpthread", 
+				"-lXrandr", 
+				"-lXi", 
+				"-ldl", 
+				"-lXxf86vm", 
+				"-lm"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
