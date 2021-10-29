@@ -2,8 +2,6 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-const int WINDOWS_WIDTH = 640;
-const int WINDOWS_HEIGHT = 480;
 
 typedef struct
 { //datatype de vertice, con posicion y color del vertice.
@@ -44,7 +42,7 @@ int main(void)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    window = glfwCreateWindow(WINDOWS_WIDTH, WINDOWS_HEIGHT, "Demo Puntos", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Demo Puntos", NULL, NULL);
 
     if (!window)
     {
