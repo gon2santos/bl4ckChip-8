@@ -55,6 +55,7 @@ int main(void)
     /////////////////////////// compilar y linkear shaders ////////////////////////////////////
     //=========================================================================================
 
+    //compilar vertex shader
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);            //crear vertex shader y gurdar su id
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); //meter el codigo del shader en el objeto shader creado
@@ -71,36 +72,70 @@ int main(void)
         printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSourceORG, NULL);
-    glCompileShader(fragmentShader);
+    //compilar fragment shader orange
+    unsigned int fragmentShaderORG;
+    fragmentShaderORG = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderORG, 1, &fragmentShaderSourceORG, NULL);
+    glCompileShader(fragmentShaderORG);
 
     //ERROR CHECK DE COMPILACION DEL FR SHADER
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(fragmentShaderORG, GL_COMPILE_STATUS, &success);
 
     if (!success)
     {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(fragmentShaderORG, 512, NULL, infoLog);
         printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();             //crear un shader program obj para unir los shaders compilados
-    glAttachShader(shaderProgram, vertexShader);   //agregar el vertexshader al program obj
-    glAttachShader(shaderProgram, fragmentShader); //agregar el fragment shader al program object
-    glLinkProgram(shaderProgram);                  //unir/link ambos shaders para que la salida de uno sea la intrada del otro
+    //compilar fragment shader yellow
+    unsigned int fragmentShaderYLW;
+    fragmentShaderYLW = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderYLW, 1, &fragmentShaderSourceYLW, NULL);
+    glCompileShader(fragmentShaderYLW);
+
+    //ERROR CHECK DE COMPILACION DEL FR SHADER
+    glGetShaderiv(fragmentShaderYLW, GL_COMPILE_STATUS, &success);
+
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShaderYLW, 512, NULL, infoLog);
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
+    }
+
+    //crear shader program
+    unsigned int shaderProgramORG;
+    shaderProgramORG = glCreateProgram();             //crear un shader program obj para unir los shaders compilados
+    glAttachShader(shaderProgramORG, vertexShader);   //agregar el vertexshader al program obj
+    glAttachShader(shaderProgramORG, fragmentShaderORG); //agregar el fragment shader al program object
+    glLinkProgram(shaderProgramORG);                  //unir/link ambos shaders para que la salida de uno sea la intrada del otro
 
     //ERROR CHECK EN EL LINKEADO DE LOS SHADERS
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(shaderProgramORG, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(shaderProgramORG, 512, NULL, infoLog);
         printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
+    //crear shader program
+    unsigned int shaderProgramYLW;
+    shaderProgramYLW = glCreateProgram();             //crear un shader program obj para unir los shaders compilados
+    glAttachShader(shaderProgramYLW, vertexShader);   //agregar el vertexshader al program obj
+    glAttachShader(shaderProgramYLW, fragmentShaderYLW); //agregar el fragment shader al program object
+    glLinkProgram(shaderProgramYLW);                  //unir/link ambos shaders para que la salida de uno sea la intrada del otro
+
+    //ERROR CHECK EN EL LINKEADO DE LOS SHADERS
+    glGetProgramiv(shaderProgramYLW, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(shaderProgramYLW, 512, NULL, infoLog);
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
+    }
+
+
     glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShaderORG);
+    glDeleteShader(fragmentShaderYLW);
 
     //==================================================================================================
     ///////////// settear datos de los vertices, buffers y atributos de los vertices ///////////////////
@@ -179,11 +214,12 @@ int main(void)
         ///////////////////////////////// renderear desde aca //////////////////////////////////////////////
         //==================================================================================================
 
-        glUseProgram(shaderProgram); //usar el shader program object
+        glUseProgram(shaderProgramORG); //usar el shader program object
         glBindVertexArray(VAO[0]); //bind VAO, no es necesario si solo tenemos uno
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
 
+        glUseProgram(shaderProgramYLW); 
         glBindVertexArray(VAO[1]); //bind VAO, no es necesario si solo tenemos uno
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
@@ -195,7 +231,8 @@ int main(void)
 
     glDeleteVertexArrays(2, VAO);
     glDeleteBuffers(2, VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteProgram(shaderProgramORG);
+    glDeleteProgram(shaderProgramYLW);
     glfwDestroyWindow(window); //destruir window y se cierra
     glfwTerminate();           //terminar GLFW para liberar recursos
     exit(EXIT_SUCCESS);
