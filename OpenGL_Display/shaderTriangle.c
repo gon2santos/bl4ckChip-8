@@ -10,11 +10,18 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
 
-const char *fragmentShaderSource = "#version 330 core\n"
+const char *fragmentShaderSourceORG = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
                                    "void main()\n"
                                    "{\n"
                                    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "}\0";
+
+const char *fragmentShaderSourceYLW = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "   FragColor = vec4(1.0f, 0.9f, 0.0f, 1.0f);\n"
                                    "}\0";
 
 int main(void)
@@ -66,7 +73,7 @@ int main(void)
 
     unsigned int fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSourceORG, NULL);
     glCompileShader(fragmentShader);
 
     //ERROR CHECK DE COMPILACION DEL FR SHADER
@@ -99,17 +106,44 @@ int main(void)
     ///////////// settear datos de los vertices, buffers y atributos de los vertices ///////////////////
     //==================================================================================================
 
-    float vertices[] = {//los veritices del triangulo
+    /*float vertices[] = {//los veritices del triangulo
                         -0.5f, -0.5f, 0.0f,
                         0.5f, -0.5f, 0.0f,
-                        0.0f, 0.5f, 0.0f};
+                        0.0f, 0.5f, 0.0f};*/
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);                                                     //crear un buffer de vertices y almacenar su id en VBO
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                        //bind el buffer apuntado por VBO al buffer de vertices
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //copiar los vertices en buffer de vertices
+    float vertices0[] = {
+                        -1.0f, -0.0f, 0.0f,
+                        0.0f, -0.0f, 0.0f,
+                        -0.5f, 0.5f, 0.0f
+                        };
+    
+    float vertices1[] = {
+                        0.0f, 0.0f, 0.0f,
+                        1.0f, 0.0f, 0.0f,
+                        0.5f, 0.5f, 0.0f
+                        };
+
+
+
+    unsigned int VBO[2];
+    unsigned int VAO[2];
+    glGenVertexArrays(2, VAO);
+    glGenBuffers(2, VBO);                                                     //crear un buffer de vertices y almacenar su id en VBO
+    glBindVertexArray(VAO[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);                                        //bind el buffer apuntado por VBO al buffer de vertices
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices0), vertices0, GL_STATIC_DRAW); //copiar los vertices en buffer de vertices
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0); 
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0); //unbind VBO
+    glBindVertexArray(0); //unbind VAO
+
+    //configurar 2ndo VAO y VBO
+
+    glBindVertexArray(VAO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);                                        //bind el buffer apuntado por VBO al buffer de vertices
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW); //copiar los vertices en buffer de vertices
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0); 
@@ -141,18 +175,26 @@ int main(void)
         glLoadIdentity();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //renderear aca
+        //==================================================================================================
+        ///////////////////////////////// renderear desde aca //////////////////////////////////////////////
+        //==================================================================================================
+
         glUseProgram(shaderProgram); //usar el shader program object
-        glBindVertexArray(VAO); //bind VAO, no es necesario si solo tenemos uno
-        glDrawArrays(GL_TRIANGLES, 0, 3);//
-        
+        glBindVertexArray(VAO[0]); //bind VAO, no es necesario si solo tenemos uno
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
+
+        glBindVertexArray(VAO[1]); //bind VAO, no es necesario si solo tenemos uno
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
+
         //swap buffers y poll events
         glfwSwapBuffers(window); //intercambiar el front y back buffer de la ventana
         glfwPollEvents();        //procesar el events queue, como los inputs, para evitar bloqueos
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(2, VAO);
+    glDeleteBuffers(2, VBO);
     glDeleteProgram(shaderProgram);
     glfwDestroyWindow(window); //destruir window y se cierra
     glfwTerminate();           //terminar GLFW para liberar recursos
