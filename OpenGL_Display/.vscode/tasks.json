@@ -12,6 +12,7 @@
 				"${fileDirname}/bin/${fileBasenameNoExtension}",
 				"${file}",
 				"glad.c",
+				"shader_s.c",
 				"-lglfw3",
 				"-lGL",
 				"-lX11", 
